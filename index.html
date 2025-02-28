@@ -9,34 +9,17 @@
       margin: 0;
       padding: 20px;
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #eef2f3, #d0dae3);
+      /* Use your local image as the background, repeating to cover the entire viewport */
+      background: url("images/fish_background.webp") repeat;
+    background-size: contain;
+      color: #333;
+    background-size: contain;
       color: #333;
     }
     h1 {
       text-align: center;
       margin-bottom: 20px;
       font-size: 2em;
-    }
-    /* Legend */
-    .legend {
-      width: 800px;
-      max-width: 95%;
-      margin: 0 auto 20px;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      font-size: 0.95em;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .legend-color {
-      width: 18px;
-      height: 18px;
-      border-radius: 3px;
-      border: 1px solid #aaa;
     }
     /* Card Styles */
     .card {
@@ -76,14 +59,17 @@
     .label-cell {
       background: #f0f0f0;
       font-weight: 600;
-      width: 80px;
-      text-align: right;
+      width: 140px;
+      text-align: left;
+      padding-left: 10px;
     }
     /* Timeline stripe */
     .stripe {
       position: absolute;
       left: 0;
       width: 100%;
+      top: 0;
+      height: 100%;
     }
     /* Color Classes (new palette) */
     .columbia      { background-color: #4A90E2; }
@@ -94,31 +80,8 @@
   </style>
 </head>
 <body>
-  <h1>Yakima Basin Migration Chart</h1>
 
-  <!-- Legend placed below title -->
-  <div class="legend">
-    <div class="legend-item">
-      <div class="legend-color columbia"></div>
-      Columbia Entry
-    </div>
-    <div class="legend-item">
-      <div class="legend-color yakima"></div>
-      Yakima Entry
-    </div>
-    <div class="legend-item">
-      <div class="legend-color holding"></div>
-      Holding
-    </div>
-    <div class="legend-item">
-      <div class="legend-color spawning"></div>
-      Spawning
-    </div>
-    <div class="legend-item">
-      <div class="legend-color outmigration"></div>
-      Outmigration
-    </div>
-  </div>
+</div>
 
   <!-- Container for separate run cards -->
   <div id="migrationCards"></div>
@@ -126,25 +89,25 @@
   <script>
     /********************************************************************
      * Overlap Logic:
-     * An event covers month M (1..12) if:
-     *    event.start < (M+1) AND event.end >= M.
+     * A segment covers month M (1..12) if:
+     *    segment.start < (M+1) AND segment.end >= M.
      ********************************************************************/
-    function overlapsMonth(event, month) {
-      return (event.start < month + 1) && (event.end >= month);
+    function overlapsMonth(segment, month) {
+      return (segment.start < month + 1) && (segment.end >= month);
     }
 
     /********************************************************************
-     * Data Structure for each run
+     * Data Structure for each run (all runs included)
      ********************************************************************/
     const runs = [
       {
         name: "Spring Chinook",
-        adultDesc: "Earliest Chinook run – adults enter from Feb to Jun, with the peak in Apr-May. Most are in the Yakima Apr-Jun. They hold in their native tributaries (e.g. American River, Naches River, Teanaway River, upper Yakima River), and spawn late Aug–Sep. Chinook in the American River peak in early August, while those in the upper Yakima mainstem peak in mid to late September. Spend 2-3 years in the ocean, typically return as 4‑year-olds.",
+        adultDesc: "Earliest Chinook run – adults enter from Feb to Jun, with the peak in Apr-May. Most are in the Yakima Apr-Jun. They hold in their native tributaries (e.g., American River, Naches River, Teanaway River, upper Yakima River), and spawn late Aug–Sep. Return typically as 4‑year-olds.",
         juvenileDesc: "Juveniles rear in natal streams for ~1 year before outmigration (Apr–May).",
         adultEvents: [
-          { type: "Columbia Entry",  color: "columbia",  start: 2,   end: 6 },
-          { type: "Yakima Entry",    color: "yakima",    start: 4,   end: 6 },
-          { type: "Holding",         color: "holding",   start: 7,   end: 8.5 },
+          { type: "Columbia Entry",  color: "columbia",  start: 2, end: 6 },
+          { type: "Yakima Entry",    color: "yakima",    start: 4, end: 6 },
+          { type: "Holding",         color: "holding",   start: 7, end: 8.5 },
           { type: "Spawning",        color: "spawning",  start: 8.5, end: 9.5 }
         ],
         juvenileEvents: [
@@ -153,7 +116,7 @@
       },
       {
         name: "Summer Chinook",
-        adultDesc: "Adults enter Jun–Aug and spawn in lower elevation reaches compared to Spring Chinook in early fall (Sep–Oct), spend 2-3 years in the ocean, typically returning at age 4.",
+        adultDesc: "Adults enter Jun–Aug and spawn in lower elevation reaches in early fall (Sep–Oct). Spend 2-3 years in the ocean, typically returning at age 4.",
         juvenileDesc: "Brief freshwater rearing; juveniles outmigrate from Jan–July.",
         adultEvents: [
           { type: "Columbia Entry", color: "columbia", start: 6, end: 8 },
@@ -166,11 +129,11 @@
       },
       {
         name: "Fall Chinook",
-        adultDesc: "Mainstem spawners – adults enter Aug–Oct and spawn Oct–Nov with minimal holding. 2-3 years in the ocean, typically returning at 4",
+        adultDesc: "Mainstem spawners – adults enter Aug–Oct and spawn Oct–Nov with minimal holding. Return after 2-3 years in the ocean, typically as 4‑year-olds.",
         juvenileDesc: "Subyearlings – outmigration occurs from Mar–Jul.",
         adultEvents: [
-          { type: "Columbia Entry", color: "columbia", start: 8,  end: 10 },
-          { type: "Yakima Entry",   color: "yakima",   start: 9,  end: 10 },
+          { type: "Columbia Entry", color: "columbia", start: 8, end: 10 },
+          { type: "Yakima Entry",   color: "yakima",   start: 9, end: 10 },
           { type: "Spawning",       color: "spawning", start: 10, end: 11 }
         ],
         juvenileEvents: [
@@ -179,10 +142,10 @@
       },
       {
         name: "Coho Salmon",
-        adultDesc: "Adults enter from Sep–Dec and spawn from Nov–Jan in tributaries (e.g., Big Creek, Little Creek, and tribs of the Naches), returning mostly at age 3.",
-        juvenileDesc: "Yearling rearing – juveniles spend ~1 year in freshwater; outmigration in spring (Apr–May). Acclimate in the Columbia delta before entering the ocean",
+        adultDesc: "Adults enter from Sep–Dec and spawn from Nov–Jan in tributaries (e.g., Big Creek, Little Creek). Return mostly at age 3.",
+        juvenileDesc: "Yearling rearing – juveniles spend ~1 year in freshwater; outmigration in spring (Apr–May).",
         adultEvents: [
-          { type: "Columbia Entry", color: "columbia", start: 9,  end: 11 },
+          { type: "Columbia Entry", color: "columbia", start: 9, end: 11 },
           { type: "Yakima Entry",   color: "yakima",   start: 10, end: 11 },
           { type: "Spawning",       color: "spawning", start: 11, end: 13 },
           { type: "Spawning",       color: "spawning", start: 1, end: 1 }
@@ -193,14 +156,14 @@
       },
       {
         name: "Summer Steelhead",
-        adultDesc: "Summer steelhead – adults enter Columbia late Apr–Oct (peak Jun-Sept), enter the Yakima (Aug–Nov), overwinter in the Yakima and larger tribs (Dec-Feb), and spawn in spring (Mar–May). 1-3 years in the Ocean. Some adults will spawn more than once, but the majority die.",
+        adultDesc: "Adults enter Columbia late Apr–Oct (peak Jun-Sept), then enter the Yakima (Aug–Nov), overwinter in the Yakima (Dec-Feb), and spawn in spring (Mar–May).",
         juvenileDesc: "Typically rear 1–3 years in freshwater; outmigration occurs in spring (Apr–May).",
         adultEvents: [
           { type: "Columbia Entry", color: "columbia", start: 6, end: 9 },
-          { type: "Yakima Entry",   color: "yakima",   start: 8,   end: 11 },
-          { type: "Holding",        color: "holding",   start: 12,  end: 12 },
-          { type: "Holding",        color: "holding",   start: 1,   end: 2 },
-          { type: "Spawning",       color: "spawning", start: 3,   end: 5 }
+          { type: "Yakima Entry",   color: "yakima",   start: 8, end: 11 },
+          { type: "Holding",        color: "holding",  start: 12, end: 12 },
+          { type: "Holding",        color: "holding",  start: 1, end: 2 },
+          { type: "Spawning",       color: "spawning", start: 3, end: 5 }
         ],
         juvenileEvents: [
           { type: "Outmigration",   color: "outmigration", start: 4, end: 6 }
@@ -208,8 +171,8 @@
       },
       {
         name: "Sockeye Salmon",
-        adultDesc: "Planktivorous – adults enter Jun–Jul and spawn on the shoreline and deltas mainly in Oct. Currently Cle Elum. Historically, Kachess, Keechelus, Cle Elum, and Bumping. 2 years in ocean, returning as 4",
-        juvenileDesc: "Reared in lake for ~1 year, sometimes 2; outmigration occurs in spring (Apr–May).",
+        adultDesc: "Planktivorous – adults enter Jun–Jul and spawn on the shoreline and deltas mainly in Oct. Return as 4‑year-olds.",
+        juvenileDesc: "Reared in lake for ~1 year (sometimes 2); outmigration occurs in spring (Apr–May).",
         adultEvents: [
           { type: "Columbia Entry", color: "columbia", start: 6, end: 7 },
           { type: "Yakima Entry",   color: "yakima",   start: 6, end: 8 },
@@ -221,13 +184,13 @@
       },
       {
         name: "Pacific Lamprey",
-        adultDesc: "Do not go to natal stream – Lamprey have two migration strategies: “stream-maturing” adults enter July–Sep and wait to spawn the next year, while some “ocean-maturing” adults come in during late winter/early spring and spawn shortly after entry. Adults enter from late spring to fall and spawn in spring–early summer (May–June) as late as Sept. 1-6 years in ocean, 1-3 common. Parasitize fish while in ocean",
-        juvenileDesc: "Ammocoetes dwell in sediments for 3-10 years; outmigration occurs from Nov–Dec or later.",
+        adultDesc: "Lamprey have two migration strategies. 'Stream-maturing' adults enter July–Sep and wait to spawn the next year, while 'ocean-maturing' adults come in during late winter/early spring and spawn shortly after entry.",
+        juvenileDesc: "Ammocoetes dwell in sediments for 3-10 years; outmigration occurs from Nov–Dec (or later).",
         adultEvents: [
           { type: "Columbia Entry", color: "columbia", start: 6, end: 9 },
           { type: "Yakima Entry",   color: "yakima",   start: 7, end: 10 },
-          { type: "Holding",        color: "holding",   start: 11, end: 12 },
-          { type: "Holding",        color: "holding",   start: 1, end: 3 },
+          { type: "Holding",        color: "holding",  start: 11, end: 12 },
+          { type: "Holding",        color: "holding",  start: 1, end: 3 },
           { type: "Spawning",       color: "spawning", start: 4, end: 7 }
         ],
         juvenileEvents: [
@@ -240,27 +203,25 @@
     const migrationCards = document.getElementById("migrationCards");
 
     runs.forEach(run => {
-      // Create card container for this run
+      // Create card container for each run
       const card = document.createElement("div");
       card.className = "card";
 
-      // Run title
+      // Run title and descriptions
       const title = document.createElement("h2");
       title.textContent = run.name;
       card.appendChild(title);
-
-      // Description section
       const desc = document.createElement("div");
       desc.className = "description";
       desc.innerHTML = `<p><strong>Adults:</strong> ${run.adultDesc}</p>
                         <p><strong>Juveniles:</strong> ${run.juvenileDesc}</p>`;
       card.appendChild(desc);
 
-      // Create table for timeline
+      // Create table for timeline events
       const table = document.createElement("table");
       table.className = "run-table";
 
-      // Table header with months
+      // Table header (months)
       const thead = document.createElement("thead");
       const headerRow = document.createElement("tr");
       const emptyHeader = document.createElement("th");
@@ -274,59 +235,47 @@
       thead.appendChild(headerRow);
       table.appendChild(thead);
 
-      // Table body for Adults and Juveniles
+      // Table body: group events by type+color
       const tbody = document.createElement("tbody");
-
-      // Adults row
-      const adultRow = document.createElement("tr");
-      const adultLabel = document.createElement("td");
-      adultLabel.className = "label-cell";
-      adultLabel.textContent = "Adults";
-      adultRow.appendChild(adultLabel);
-      for (let m = 1; m <= 12; m++) {
-        const cell = document.createElement("td");
-        cell.style.position = "relative";
-        const overlapping = run.adultEvents.filter(e => overlapsMonth(e, m));
-        if (overlapping.length > 0) {
-          const stripeHeight = 100 / overlapping.length;
-          overlapping.forEach((event, idx) => {
-            const stripeDiv = document.createElement("div");
-            stripeDiv.className = `stripe ${event.color}`;
-            stripeDiv.style.top = `${idx * stripeHeight}%`;
-            stripeDiv.style.height = `${stripeHeight}%`;
-            cell.appendChild(stripeDiv);
-          });
-          cell.title = overlapping.map(e => e.type).join(" + ");
+      const eventsByType = {};
+      [...run.adultEvents, ...run.juvenileEvents].forEach(event => {
+        const key = event.type + '-' + event.color;
+        if (!eventsByType[key]) {
+          eventsByType[key] = { type: event.type, color: event.color, segments: [] };
         }
-        adultRow.appendChild(cell);
-      }
-      tbody.appendChild(adultRow);
-
-      // Juveniles row
-      const juvRow = document.createElement("tr");
-      const juvLabel = document.createElement("td");
-      juvLabel.className = "label-cell";
-      juvLabel.textContent = "Juveniles";
-      juvRow.appendChild(juvLabel);
-      for (let m = 1; m <= 12; m++) {
-        const cell = document.createElement("td");
-        cell.style.position = "relative";
-        const overlapping = run.juvenileEvents.filter(e => overlapsMonth(e, m));
-        if (overlapping.length > 0) {
-          const stripeHeight = 100 / overlapping.length;
-          overlapping.forEach((event, idx) => {
-            const stripeDiv = document.createElement("div");
-            stripeDiv.className = `stripe ${event.color}`;
-            stripeDiv.style.top = `${idx * stripeHeight}%`;
-            stripeDiv.style.height = `${stripeHeight}%`;
-            cell.appendChild(stripeDiv);
-          });
-          cell.title = overlapping.map(e => e.type).join(" + ");
+        eventsByType[key].segments.push({ start: event.start, end: event.end });
+      });
+      const groups = Object.values(eventsByType);
+      
+      groups.forEach(group => {
+        const row = document.createElement("tr");
+        // Row label showing event type
+        const labelCell = document.createElement("td");
+        labelCell.className = "label-cell";
+        labelCell.textContent = group.type;
+        row.appendChild(labelCell);
+        
+        // For each month cell, check each segment in the group
+        for (let m = 1; m <= 12; m++) {
+          const cell = document.createElement("td");
+          cell.style.position = "relative";
+          // Get the segments that overlap this month
+          const overlapping = group.segments.filter(seg => overlapsMonth(seg, m));
+          if (overlapping.length > 0) {
+            const stripeHeight = 100 / overlapping.length;
+            overlapping.forEach((seg, idx) => {
+              const stripeDiv = document.createElement("div");
+              stripeDiv.className = `stripe ${group.color}`;
+              stripeDiv.style.top = `${idx * stripeHeight}%`;
+              stripeDiv.style.height = `${stripeHeight}%`;
+              cell.appendChild(stripeDiv);
+            });
+          }
+          row.appendChild(cell);
         }
-        juvRow.appendChild(cell);
-      }
-      tbody.appendChild(juvRow);
-
+        tbody.appendChild(row);
+      });
+      
       table.appendChild(tbody);
       card.appendChild(table);
       migrationCards.appendChild(card);
